@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the YITH WooCommerce Gift Cards package.
 msgid ""
 msgstr ""
-"Project-Id-Version: YITH WooCommerce Gift Cards 4.24.0\n"
+"Project-Id-Version: YITH WooCommerce Gift Cards 4.25.0\n"
 "Report-Msgid-Bugs-To: YITH <plugins@yithemes.com>\n"
-"POT-Creation-Date: 2025-04-24 13:08:08+00:00\n"
+"POT-Creation-Date: 2025-06-04 14:02:20+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -771,40 +771,50 @@ msgid "[{site_title}] You have received a gift card"
 msgstr ""
 
 #: includes/emails/class-yith-ywgc-email-send-gift-card.php:54
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:176
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:180
 msgid ""
 "Hi {recipient_name}, you have received this gift card from {sender}, use it "
 "on our online shop."
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:171
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:175
 msgid "a friend"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:261
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:265
 msgid "Enable/Disable"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:264
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:268
 msgid "Enable this email notification"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:268
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:272
 msgid "Subject"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:271
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:279
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:287
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:275
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:283
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:291
 msgid "Defaults to <code>%s</code>"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:276
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:280
 msgid "Email Heading"
 msgstr ""
 
-#: includes/emails/class-yith-ywgc-email-send-gift-card.php:284
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:288
 msgid "Introductive message"
+msgstr ""
+
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:317
+msgid "Happy birthday! Enjoy this gift on your most special day."
+msgstr ""
+
+#: includes/emails/class-yith-ywgc-email-send-gift-card.php:338
+msgid ""
+"Hi John, you have received this gift card from Mary, use it on our online "
+"shop."
 msgstr ""
 
 #: includes/functions.yith-ywgc.php:174
@@ -935,7 +945,7 @@ msgstr ""
 
 #: plugin-options/settings/general-options.php:131
 #: templates/emails/automatic-discount.php:13
-#: templates/emails/automatic-discount.php:19
+#: templates/emails/automatic-discount.php:22
 msgid "Apply your gift card code"
 msgstr ""
 
