@@ -1,13 +1,18 @@
 <?php
+/**
+ * Class to manage the cart and checkout features
+ *
+ * @package YITH\GiftCards\Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 
 	/**
-	 *
-	 * @class   YITH_YWGC_Cart_Checkout
+	 * YITH_YWGC_Cart_Checkout class
 	 *
 	 * @since   1.0.0
 	 * @author  YITH <plugins@yithemes.com>
@@ -17,6 +22,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Single instance of the class
 		 *
+		 * @var YITH_YWGC_Cart_Checkout
 		 * @since 1.0.0
 		 */
 		protected static $instance;
@@ -42,9 +48,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		 * @since  1.0
 		 */
 		protected function __construct() {
-
 			/**
-			 * set the price when a gift card product is added to the cart
+			 * Set the price when a gift card product is added to the cart
 			 */
 			add_filter( 'woocommerce_add_cart_item', array( $this, 'set_price_in_cart' ), 10, 1 );
 
@@ -101,7 +106,6 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			}
 
 			add_action( 'woocommerce_mini_cart_contents', array( $this, 'calculate_cart_total_in_the_mini_cart' ) );
-
 		}
 
 		/**
@@ -110,8 +114,9 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		 * @return void
 		 */
 		public function ywgc_apply_gift_card_on_coupon_form() {
-
-			add_action( 'woocommerce_after_calculate_totals', array( $this, 'ywgc_allow_shipping_in_coupons' ) );
+			if ( ! has_block( 'woocommerce/checkout', wc_get_page_id( 'checkout' ) ) ) {
+				add_action( 'woocommerce_after_calculate_totals', array( $this, 'ywgc_allow_shipping_in_coupons' ) );
+			}
 
 			/**
 			 * Verify if a coupon code inserted on cart page or checkout page belong to a valid gift card.
@@ -119,15 +124,18 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			 */
 			add_filter( 'woocommerce_get_shop_coupon_data', array( $this, 'verify_coupon_code' ), 10, 2 );
 
-			add_action( 'woocommerce_new_order_item', array( $this, 'deduct_amount_from_gift_card_wc_3_plus' ), 10, 3 );
-
+			/**
+			 * Deduct the value of the gift card added as a coupon from the real gift card.
+			 */
+			add_action( 'woocommerce_checkout_order_processed', array( $this, 'deduct_gift_card_amount_from_coupon_item' ), 10, 3 );
+			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'deduct_gift_card_amount_from_coupon_item' ), 10 );
 		}
 
 		/**
 		 * Verify the gift card value
 		 *
-		 * @param array  $return_val the returning value
-		 * @param string $code       the gift card code
+		 * @param array  $return_val the returning value.
+		 * @param string $code       the gift card code.
 		 *
 		 * @return array
 		 * @since  2.0.4
@@ -221,9 +229,9 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Deduct_amount_from_gift_card
 		 *
-		 * @param  mixed $id id.
-		 * @param  mixed $item_id item_id.
-		 * @param  mixed $code code.
+		 * @param  mixed $order_id Order ID.
+		 * @param  mixed $item_id  Item ID.
+		 * @param  mixed $code     code.
 		 * @param  mixed $discount_amount discount_amount.
 		 * @param  mixed $discount_amount_tax discount_amount_tax.
 		 * @return void
@@ -235,24 +243,30 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			$total_discount_amount = $discount_amount + $discount_amount_tax;
 
 			if ( $gift instanceof YITH_YWGC_Gift_Card ) {
-
 				$gift->update_balance( $gift->get_balance() - $total_discount_amount );
 				$gift->register_order( $order_id );
 			}
-
 		}
 
 		/**
-		 * @param $item_id
-		 * @param $item
-		 * @param $order_id
+		 * Deduct amount from gift card.
+		 *
+		 * @param object $order Order object.
 		 */
-		public function deduct_amount_from_gift_card_wc_3_plus( $item_id, $item, $order_id ) {
+		public function deduct_gift_card_amount_from_coupon_item( $order ) {
 
-			if ( $item instanceof WC_Order_Item_Coupon ) {
-				$this->deduct_amount_from_gift_card( $order_id, $item_id, $item->get_code(), $item->get_discount(), $item->get_discount_tax() );
+			if ( is_numeric( $order ) ) {
+				$order = wc_get_order( $order );
 			}
 
+			foreach ( $order->get_items( 'coupon' ) as $coupon ) {
+				$coupon_code = $coupon->get_code();
+				$gift        = YITH_YWGC()->get_gift_card_by_code( $coupon_code );
+
+				if ( is_object( $gift ) && $gift->exists() ) {
+					$this->deduct_amount_from_gift_card( $order->get_id(), $coupon->get_id(), $coupon->get_code(), $coupon->get_discount(), $coupon->get_discount_tax() );
+				}
+			}
 		}
 
 		/**
@@ -357,7 +371,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 							$shipping_taxes_key[] = $cart_shipping_taxes_key;
 
 							$shipping_total = $cart->get_shipping_total() + $cart_shipping_taxes_value;
-							$cart->set_shipping_total( $shipping_total ); // set to zero to allow PayPal payment
+							$cart->set_shipping_total( $shipping_total ); // set to zero to allow PayPal payment.
 
 							$cart->set_shipping_tax( 0 );
 							$cart->set_shipping_taxes( array( $cart_shipping_taxes_key => 0 ) );
@@ -373,15 +387,16 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					}
 				}
 			}
-
 		}
 
 		/**
 		 * Add the remaining cart amount to the gift card added as coupon
 		 *
+		 * @param string $remaining_amount Remaining gift card amount.
+		 *
 		 * @since  3.0.0
 		 */
-		function ywgc_charge_other_amounts_on_coupons( $remaining_amount ) {
+		public function ywgc_charge_other_amounts_on_coupons( $remaining_amount ) {
 
 			$cart = WC()->cart;
 
@@ -418,7 +433,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					}
 				}
 
-				if ( $remaining_amount == 0 ) {
+				if ( 0 === $remaining_amount ) {
 					return;
 				}
 			}
@@ -428,61 +443,48 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		 *
 		 * Show the image chosen for a gift card
 		 *
-		 * @param string $product_image    the product title HTML
-		 * @param array  $cart_item        the cart item array
-		 * @param bool   $cart_item_key    The cart item key
+		 * @param string $product_image the product title HTML.
+		 * @param array  $cart_item     the cart item array.
 		 *
 		 * @since    2.0.1
 		 * @return  string  The product title HTML
 		 * @use     woocommerce_cart_item_thumbnail hook
 		 */
-		public function ywgc_custom_cart_product_image( $product_image, $cart_item, $cart_item_key = false ) {
-
+		public function ywgc_custom_cart_product_image( $product_image, $cart_item ) {
 			if ( ! isset( $cart_item['ywgc_amount'] ) ) {
 				return $product_image;
 			}
 
 			if ( ! empty( $cart_item['ywgc_has_custom_design'] ) ) {
-
 				$design_type = $cart_item['ywgc_design_type'];
 
 				if ( 'custom' === $design_type ) {
-
 					$image = YITH_YWGC_SAVE_URL . '/' . $cart_item['ywgc_design'];
 
 					$product_image = '<img width="300" height="300" src="' . $image . '" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
             alt="" srcset="' . $image . ' 300w, ' . $image . ' 600w, ' . $image . ' 100w, ' . $image . ' 150w, ' . $image . ' 768w, ' . $image . ' 1024w"
             sizes="(max-width: 300px) 100vw, 300px" />';
-
 				} elseif ( 'template' === $design_type ) {
 					$product_image = wp_get_attachment_image( $cart_item['ywgc_design'] );
-
 				} elseif ( 'custom-modal' === $design_type ) {
-
 					$image_url = $cart_item['ywgc_design'];
 
 					$product_image = '<img width="300" height="300" src="' . $image_url . '" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
             alt="" srcset="' . $image_url . ' 300w, ' . $image_url . ' 600w, ' . $image_url . ' 100w, ' . $image_url . ' 150w, ' . $image_url . ' 768w, ' . $image_url . ' 1024w"
             sizes="(max-width: 300px) 100vw, 300px" />';
-
 				}
-			} else {
-
+			} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found
 				if ( isset( $cart_item['ywgc_product_as_present'] ) && $cart_item['ywgc_product_as_present'] ) {
-
 					$image = YITH_YWGC()->get_default_header_image();
 
 					$array_product_image = explode( 'src=', $product_image );
 					$array_product_image = explode( '"', $array_product_image[1] );
 
 					$product_image = str_replace( $array_product_image[1], $image, $product_image );
-
 				} else {
-
 					$_product = wc_get_product( $cart_item['product_id'] );
 
-					if ( get_class( $_product ) == 'WC_Product_Gift_Card' ) {
-
+					if ( get_class( $_product ) === 'WC_Product_Gift_Card' ) {
 						$image_id         = get_post_thumbnail_id( $_product->get_id() );
 						$header_image_url = wp_get_attachment_url( $image_id );
 
@@ -511,8 +513,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Show gift cards usage on order item totals
 		 *
-		 * @param array    $total_rows
-		 * @param WC_Order $order
+		 * @param array    $total_rows Total rows.
+		 * @param WC_Order $order      Order object.
 		 *
 		 * @return array
 		 */
@@ -625,7 +627,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					$value = wc_price( $amount ) . ' <a href="' . esc_url(
 						add_query_arg(
 							'remove_gift_card_code',
-							urlencode( $code ),
+							urlencode( $code ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.urlencode_urlencode
 							defined( 'WOOCOMMERCE_CHECKOUT' ) ? wc_get_checkout_url() : wc_get_cart_url()
 						)
 					) . '" class="ywgc-remove-gift-card " data-gift-card-code="' . esc_attr( $code ) . '">' . apply_filters( 'ywgc_remove_gift_card_text', esc_html__( '[Remove]', 'yith-woocommerce-gift-cards' ) ) . '</a>';
@@ -658,8 +660,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		 * @param  mixed $b b.
 		 * @return int
 		 */
-		function cmp( $a, $b ) {
-			if ( $a == $b ) {
+		public function cmp( $a, $b ) {
+			if ( $a === $b ) {
 				return 0;
 			}
 
@@ -669,14 +671,14 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Apply a gift card discount to current cart
 		 *
-		 * @param string $code
+		 * @param string $code Gift card code.
 		 */
 		protected function add_gift_card_code_to_session( $code ) {
 			$applied_gift_cards = $this->get_gift_cards_from_session();
 
 			$code = strtoupper( $code );
 
-			if ( ! in_array( $code, $applied_gift_cards ) ) {
+			if ( ! in_array( $code, $applied_gift_cards, true ) ) {
 				$applied_gift_cards[] = $code;
 				WC()->session->set( 'applied_gift_cards', $applied_gift_cards );
 			}
@@ -685,12 +687,14 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Remove a gift card discount from current cart
 		 *
-		 * @param string $code
+		 * @param string $code Gift card code.
 		 */
 		protected function remove_gift_card_code_from_session( $code ) {
 			$applied_gift_cards = $this->get_gift_cards_from_session();
 
-			if ( ( $key = array_search( $code, $applied_gift_cards ) ) !== false ) {
+			$key = array_search( $code, $applied_gift_cards, true );
+
+			if ( false !== $key ) {
 				unset( $applied_gift_cards[ $key ] );
 			}
 
@@ -726,7 +730,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Apply the gift cards discount to the cart
 		 *
-		 * @param WC_Cart $cart
+		 * @param WC_Cart $cart Cart object.
 		 */
 		public function apply_gift_cards_discount( $cart ) {
 
@@ -740,7 +744,6 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 
 				$gift_card_amounts = array();
 				foreach ( $gift_card_codes as $code ) {
-					/** @var YITH_YWGC_Gift_Card $gift_card */
 					$gift_card = YITH_YWGC()->get_gift_card_by_code( $code );
 
 					if ( is_object( $gift_card ) && YITH_YWGC()->check_gift_card( $gift_card, true ) ) {
@@ -888,7 +891,6 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					}
 				}
 			}
-
 		}
 
 		/**
@@ -944,9 +946,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Update the balance for all gift cards applied to an order
 		 *
-		 * @throws Exception
-		 *
-		 * @param int $order_id
+		 * @param int|WC_Order $order_id Order ID or order object.
 		 */
 		public function register_gift_cards_usage( $order_id ) {
 
@@ -983,8 +983,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 						$applied_gift_cards[ $code ] = $amount;
 						$applied_discount           += $amount;
 
-						// Avoid charging twice if there is a YITH Multi Vendor suborder
-						if ( ! $created_via || 'yith_wcmv_vendor_suborder' != $created_via ) {
+						// Avoid charging twice if there is a YITH Multi Vendor suborder.
+						if ( ! $created_via || 'yith_wcmv_vendor_suborder' !== $created_via ) {
 							/**
 							 * APPLY_FILTERS: yith_ywgc_new_balance_before_update_balance
 							 *
@@ -1005,7 +1005,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 				}
 			}
 
-			if ( $applied_gift_cards && ( ! $created_via || 'yith_wcmv_vendor_suborder' != $created_via ) ) {
+			if ( $applied_gift_cards && ( ! $created_via || 'yith_wcmv_vendor_suborder' !== $created_via ) ) {
 				$order       = wc_get_order( $order_id );
 				$order_total = $order->get_total();
 
@@ -1018,7 +1018,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 				$order->add_order_note( sprintf( esc_html__( 'Order paid with gift cards for a total amount of %s.', 'yith-woocommerce-gift-cards' ), wc_price( $applied_discount ) ) );
 
 				$order->save();
-			} elseif ( ! ! $created_via && 'yith_wcmv_vendor_suborder' == $created_via ) {
+			} elseif ( ! ! $created_via && 'yith_wcmv_vendor_suborder' === $created_via ) {
 				$applied_discount = apply_filters( 'ywgc_gift_card_amount_order_total_item', $applied_discount, $gift );
 				$order->add_order_note( sprintf( esc_html__( 'Order paid with gift cards for a total amount of %s.', 'yith-woocommerce-gift-cards' ), wc_price( $applied_discount ) ) );
 				$order->save();
@@ -1276,13 +1276,13 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					exit;
 				}
 			}
-
 		}
 
 		/**
 		 * Set the real amount for the gift card product
 		 *
-		 * @param array $cart_item
+		 * @param int $product_id Product ID.
+		 * @param int $quantity   Quantity.
 		 *
 		 * @since 1.5.0
 		 * @return mixed
@@ -1295,7 +1295,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Set the real amount for the gift card product
 		 *
-		 * @param array $cart_item
+		 * @param array $cart_item Cart item.
 		 *
 		 * @since 1.5.0
 		 * @return mixed
@@ -1318,16 +1318,14 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Update cart item when retrieving cart from session
 		 *
-		 * @param $session_data mixed Session data to add to cart
-		 * @param $values       mixed Values stored in session
+		 * @param mixed $session_data Session data to add to cart.
+		 * @param mixed $values       Values stored in session.
 		 *
 		 * @return mixed Session data
 		 * @since 1.5.0
 		 */
 		public function get_cart_item_from_session( $session_data, $values ) {
-
 			if ( isset( $values['ywgc_product_id'] ) && $values['ywgc_product_id'] ) {
-
 				$session_data['ywgc_product_id']              = isset( $values['ywgc_product_id'] ) ? $values['ywgc_product_id'] : '';
 				$session_data['ywgc_amount']                  = isset( $values['ywgc_amount'] ) ? $values['ywgc_amount'] : '';
 				$session_data['ywgc_amount_without_discount'] = isset( $values['ywgc_amount_without_discount'] ) ? $values['ywgc_amount_without_discount'] : '';
@@ -1345,21 +1343,21 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 
 					$session_data['ywgc_has_custom_design'] = isset( $values['ywgc_has_custom_design'] ) ? $values['ywgc_has_custom_design'] : false;
 					$session_data['ywgc_design_type']       = isset( $values['ywgc_design_type'] ) ? $values['ywgc_design_type'] : '';
+
 					if ( $session_data['ywgc_has_custom_design'] ) {
 						$session_data['ywgc_design'] = isset( $values['ywgc_design'] ) ? $values['ywgc_design'] : '';
 					}
 
 					$session_data['ywgc_postdated'] = isset( $values['ywgc_postdated'] ) ? $values['ywgc_postdated'] : false;
+
 					if ( $session_data['ywgc_postdated'] ) {
 						$session_data['ywgc_delivery_date'] = isset( $values['ywgc_delivery_date'] ) ? $values['ywgc_delivery_date'] : false;
 					}
 
 					$session_data['ywgc_delivery_notification_checkbox'] = isset( $values['ywgc_delivery_notification_checkbox'] ) ? $values['ywgc_delivery_notification_checkbox'] : 'off';
-
 				}
 
 				if ( isset( $values['ywgc_amount'] ) ) {
-
 					/**
 					 * APPLY_FILTERS: yith_ywgc_set_cart_item_price
 					 *
@@ -1380,20 +1378,17 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		}
 
 		/**
-		 * @param                       $item_id
-		 * @param WC_Order_Item_Product $item
+		 * Append gift card data to the order item.
 		 *
-		 * @throws Exception
+		 * @param int                   $item_id Order item ID.
+		 * @param WC_Order_Item_Product $item    Order item object.
 		 */
-
 		public function append_gift_card_data_to_new_order_item( $item_id, $item ) {
-
 			if ( ! $item ) {
 				return;
 			}
 
 			if ( 'line_item' === $item->get_type() ) {
-
 				if ( isset( $item->legacy_values ) ) {
 					$this->append_gift_card_data_to_order_item( $item_id, $item->legacy_values );
 				}
@@ -1403,14 +1398,12 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		/**
 		 * Append data to order item
 		 *
-		 * @param int   $item_id
-		 * @param array $values
+		 * @param int   $item_id Order item ID.
+		 * @param array $values        Values to save.
 		 *
-		 * @throws Exception
 		 * @since  1.5.0
 		 */
 		public function append_gift_card_data_to_order_item( $item_id, $values ) {
-
 			if ( ! isset( $values['ywgc_product_id'] ) ) {
 				return;
 			}
@@ -1418,9 +1411,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			/**
 			 * Store all fields related to Gift Cards
 			 */
-
 			foreach ( $values as $key => $value ) {
-				if ( strpos( $key, 'ywgc_' ) == 0 ) {//phpcs:ignore
+				if ( strpos( $key, 'ywgc_' ) === 0 ) {
 					$meta_key = '_' . $key;
 					wc_update_order_item_meta( $item_id, $meta_key, $value );
 				}
@@ -1436,14 +1428,12 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			 * Store the plugin version for future use
 			 */
 			wc_update_order_item_meta( $item_id, '_ywgc_version', YITH_YWGC_VERSION );
-
 		}
 
 		/**
 		 * Calculate the cart total for the mini cart - Fix calculation issues when adding a gift card to the cart
 		 */
 		public function calculate_cart_total_in_the_mini_cart() {
-
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				$_product = wc_get_product( $cart_item['product_id'] );
 				if ( $_product->is_type( 'gift-card' ) ) {
@@ -1451,9 +1441,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 					break;
 				}
 			}
-
 		}
-
 	}
 }
 
@@ -1463,7 +1451,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
  * @return YITH_YWGC_Cart_Checkout|YITH_YWGC_Cart_Checkout_Premium|YITH_YWGC_Cart_Checkout_Extended
  * @since 2.0.0
  */
-function YITH_YWGC_Cart_Checkout() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
+function YITH_YWGC_Cart_Checkout() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid, Universal.Files.SeparateFunctionsFromOO
 	if ( defined( 'YITH_YWGC_PREMIUM' ) ) {
 		$instance = YITH_YWGC_Cart_Checkout_Premium::get_instance();
 	} elseif ( defined( 'YITH_YWGC_EXTENDED' ) ) {

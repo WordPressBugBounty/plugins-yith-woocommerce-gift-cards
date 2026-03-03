@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the YITH WooCommerce Gift Cards package.
 msgid ""
 msgstr ""
-"Project-Id-Version: YITH WooCommerce Gift Cards 4.31.0\n"
+"Project-Id-Version: YITH WooCommerce Gift Cards 4.32.0\n"
 "Report-Msgid-Bugs-To: YITH <plugins@yithemes.com>\n"
-"POT-Creation-Date: 2026-01-26 13:19:07+00:00\n"
+"POT-Creation-Date: 2026-03-03 15:07:21+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -617,21 +617,21 @@ msgstr ""
 msgid "This code is already applied"
 msgstr ""
 
-#: includes/class-yith-ywgc-cart-checkout.php:166
+#: includes/class-yith-ywgc-cart-checkout.php:174
 msgid ""
 "It is not possible to add a gift card code when the cart contains a gift "
 "card product"
 msgstr ""
 
-#: includes/class-yith-ywgc-cart-checkout.php:558
+#: includes/class-yith-ywgc-cart-checkout.php:560
 msgid "Gift cards:"
 msgstr ""
 
-#: includes/class-yith-ywgc-cart-checkout.php:601
+#: includes/class-yith-ywgc-cart-checkout.php:603
 msgid "Gift card:"
 msgstr ""
 
-#: includes/class-yith-ywgc-cart-checkout.php:631
+#: includes/class-yith-ywgc-cart-checkout.php:633
 msgid "[Remove]"
 msgstr ""
 
