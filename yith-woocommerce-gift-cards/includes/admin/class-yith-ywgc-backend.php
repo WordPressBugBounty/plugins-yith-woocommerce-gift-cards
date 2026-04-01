@@ -1200,7 +1200,7 @@ if ( ! class_exists( 'YITH_YWGC_Backend' ) ) {
 		 */
 		public function update_gift_card_amount_on_order_status_change( $order_id, $from_status, $to_status, $order = false ) {
 			if ( $order && $order instanceof WC_Order ) {
-				$created_via                  = get_post_meta( $order_id, '_created_via', true );
+				$created_via                  = $order->get_created_via();
 				$is_gift_card_amount_refunded = $order->get_meta( '_ywgc_is_gift_card_amount_refunded' );
 				if ( ( 'cancelled' === $to_status || ( 'refunded' === $to_status ) || ( 'failed' === $to_status ) ) && 'yes' !== $is_gift_card_amount_refunded ) {
 					$gift_card_applied = $order->get_meta( '_ywgc_applied_gift_cards' );

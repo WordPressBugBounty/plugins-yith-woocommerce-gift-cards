@@ -106,6 +106,8 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			}
 
 			add_action( 'woocommerce_mini_cart_contents', array( $this, 'calculate_cart_total_in_the_mini_cart' ) );
+
+			add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'avoid_orders_with_gift_cards_zero_amount' ) );
 		}
 
 		/**
@@ -962,7 +964,7 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			$applied_discount   = 0.00;
 
 			$applied_gift_cards_amount = isset( WC()->cart ) ? WC()->cart->applied_gift_cards_amounts : array();
-			$created_via               = get_post_meta( $order_id, '_created_via', true );
+			$created_via               = $order->get_created_via();
 
 			if ( isset( $applied_gift_cards_amount ) && is_array( $applied_gift_cards_amount ) ) {
 				foreach ( $applied_gift_cards_amount as $code => $amount ) {
@@ -1439,6 +1441,21 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 				if ( $_product->is_type( 'gift-card' ) ) {
 					WC()->cart->calculate_totals();
 					break;
+				}
+			}
+		}
+
+		/**
+		 * Not allow orders for gift card products with price 0
+		 *
+		 * @param WC_Order_Item $item Order item object.
+		 *
+		 * @throws Exception When the gift card price is 0.
+		 */
+		public function avoid_orders_with_gift_cards_zero_amount( $item ) {
+			if ( $item->get_product()->get_type() === 'gift-card' ) {
+				if ( $item->get_total() <= 0 ) {
+					throw new Exception( esc_html__( 'The gift card has an invalid amount', 'yith-woocommerce-gift-cards' ) );
 				}
 			}
 		}

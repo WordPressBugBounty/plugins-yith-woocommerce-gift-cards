@@ -505,11 +505,13 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Cards_Post_Type_Admin' ) ) {
 				<div>
 					<?php
 					if ( $gift_card->delivery_date ) :
+						$delivery_date_formatted = apply_filters( 'yith_ywgc_delivery_date_formatted', get_post_meta( $post_ID, '_ywgc_delivery_date_formatted', true ), $gift_card );
+
 						?>
 						<span>
 							<?php
 							// translators: %s is the gift card delivery date.
-							echo esc_html( sprintf( __( 'Delivery date: %s', 'yith-woocommerce-gift-cards' ), get_post_meta( $post_ID, '_ywgc_delivery_date_formatted', true ) ) );
+							echo esc_html( sprintf( __( 'Delivery date: %s', 'yith-woocommerce-gift-cards' ), $delivery_date_formatted ) );
 							?>
 						</span>
 						<br>
