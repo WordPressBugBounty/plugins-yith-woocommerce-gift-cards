@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the YITH WooCommerce Gift Cards package.
 msgid ""
 msgstr ""
-"Project-Id-Version: YITH WooCommerce Gift Cards 4.36.0\n"
+"Project-Id-Version: YITH WooCommerce Gift Cards 4.37.0\n"
 "Report-Msgid-Bugs-To: YITH <plugins@yithemes.com>\n"
-"POT-Creation-Date: 2026-07-21 13:05:59+00:00\n"
+"POT-Creation-Date: 2026-08-26 13:45:12+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -286,7 +286,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/post-types/class-yith-ywgc-gift-card-post-type-admin.php:116
-#: includes/class-yith-woocommerce-gift-cards.php:599
+#: includes/class-yith-woocommerce-gift-cards.php:603
 msgid "All"
 msgstr ""
 
@@ -526,94 +526,94 @@ msgstr ""
 msgid "Enter your notes here. This will only be visible to the admin"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:476
+#: includes/class-yith-woocommerce-gift-cards.php:480
 msgid "Disabled"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:488
+#: includes/class-yith-woocommerce-gift-cards.php:492
 msgid "Dismissed"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:500
+#: includes/class-yith-woocommerce-gift-cards.php:504
 msgid "Code not valid"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:512
+#: includes/class-yith-woocommerce-gift-cards.php:516
 msgid "Pre-Printed"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:559
+#: includes/class-yith-woocommerce-gift-cards.php:563
 msgid "Gift card categories"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:560
-#: includes/class-yith-woocommerce-gift-cards.php:569
+#: includes/class-yith-woocommerce-gift-cards.php:564
+#: includes/class-yith-woocommerce-gift-cards.php:573
 msgid "Gift card category"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:561
+#: includes/class-yith-woocommerce-gift-cards.php:565
 msgid "Search categories"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:562
+#: includes/class-yith-woocommerce-gift-cards.php:566
 msgid "All categories"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:563
+#: includes/class-yith-woocommerce-gift-cards.php:567
 msgid "Parent category"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:564
+#: includes/class-yith-woocommerce-gift-cards.php:568
 msgid "Parent category:"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:565
+#: includes/class-yith-woocommerce-gift-cards.php:569
 msgid "Edit category"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:566
+#: includes/class-yith-woocommerce-gift-cards.php:570
 msgid "Update gift card category"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:567
+#: includes/class-yith-woocommerce-gift-cards.php:571
 msgid "Add new category"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:568
+#: includes/class-yith-woocommerce-gift-cards.php:572
 msgid "New category name"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:588
+#: includes/class-yith-woocommerce-gift-cards.php:592
 msgid "None"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:591
+#: includes/class-yith-woocommerce-gift-cards.php:595
 msgid ""
 "Select this category in your gift card product if you do not want to "
 "display images in your gift card gallery"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:602
+#: includes/class-yith-woocommerce-gift-cards.php:606
 msgid ""
 "Select this category in your gift card product if you want to display all "
 "the images categories in your gift card gallery"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:891
+#: includes/class-yith-woocommerce-gift-cards.php:895
 msgid "Your message will show up here…"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:988
+#: includes/class-yith-woocommerce-gift-cards.php:992
 msgid "This gift card code does not exist!"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:1047
+#: includes/class-yith-woocommerce-gift-cards.php:1051
 msgid ""
 "It is not possible to add any gift card if the cart contains a "
 "subscription-based product"
 msgstr ""
 
-#: includes/class-yith-woocommerce-gift-cards.php:1061
+#: includes/class-yith-woocommerce-gift-cards.php:1065
 msgid "This code is already applied"
 msgstr ""
 

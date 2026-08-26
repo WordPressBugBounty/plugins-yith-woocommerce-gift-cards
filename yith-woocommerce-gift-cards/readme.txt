@@ -2,9 +2,9 @@
 
 Contributors: yithemes
 Tags: gift card, gift cards, coupon, gift, discount
-Requires at least: 6.8
-Tested up to: 7.0
-Stable tag: 4.36.0
+Requires at least: 6.9
+Tested up to: 7.1
+Stable tag: 4.37.0
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -143,6 +143,12 @@ Want to add a new language to our YITH WooCommerce Gift Cards? Learn how to cont
 
 
 == Changelog ==
+
+= 4.37.0 - Released on 26 August 2026 =
+
+* New: support for WordPress 7.1
+* New: support for WooCommerce 11.1
+* Update: YITH plugin framework
 
 = 4.36.0 - Released on 21 July 2026 =
 

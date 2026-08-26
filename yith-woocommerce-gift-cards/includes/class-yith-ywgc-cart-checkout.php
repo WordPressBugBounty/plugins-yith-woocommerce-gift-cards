@@ -144,12 +144,6 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 		 */
 		public function verify_coupon_code( $return_val, $code ) {
 
-			$gift_card = YITH_YWGC()->get_gift_card_by_code( $code );
-
-			if ( ! is_object( $gift_card ) ) {
-				return $return_val;
-			}
-
 			/**
 			 * APPLY_FILTERS: ywgc_verify_coupon_code_condition
 			 *
@@ -162,6 +156,12 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			 * @return bool
 			 */
 			if ( apply_filters( 'ywgc_verify_coupon_code_condition', false, $return_val, $code ) ) {
+				return $return_val;
+			}
+
+			$gift_card = YITH_YWGC()->get_gift_card_by_code( $code );
+
+			if ( ! is_object( $gift_card ) ) {
 				return $return_val;
 			}
 

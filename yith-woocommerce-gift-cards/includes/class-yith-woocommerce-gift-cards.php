@@ -385,6 +385,10 @@ if ( ! class_exists( 'YITH_WooCommerce_Gift_Cards' ) ) {
 		 * @since  1.0.0
 		 */
 		public function get_gift_card_by_code( $code ) {
+			if ( ! is_scalar( $code ) || '' === trim( (string) $code ) ) {
+				return false;
+			}
+
 			$args = array( 'gift_card_number' => $code );
 
 			return new YITH_YWGC_Gift_Card( $args );

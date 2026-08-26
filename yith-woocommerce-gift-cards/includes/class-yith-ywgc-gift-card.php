@@ -238,7 +238,7 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 
 			if ( isset( $args['ID'] ) ) {
 				$post = get_post( $args['ID'] );
-			} elseif ( isset( $args['gift_card_number'] ) ) {
+			} elseif ( isset( $args['gift_card_number'] ) && is_scalar( $args['gift_card_number'] ) && '' !== trim( (string) $args['gift_card_number'] ) ) {
 				$this->gift_card_number = $args['gift_card_number'];
 
 				$post = get_posts(
@@ -350,9 +350,9 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 				update_post_meta( $this->ID, YWGC_META_GIFT_CARD_ORDERS, $orders );
 
 				// assign the customer to this gift cards...
-				$order         = wc_get_order( $order_id );
-				$customer_user = $order->get_meta( 'customer_user' );
-				$this->register_user( $customer_user );
+				$order = wc_get_order( $order_id );
+
+				$this->register_user( $order->get_user_id() );
 			}
 		}
 
@@ -378,7 +378,7 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 		 * @since  1.0.0
 		 */
 		public function register_user( $user_id ) {
-			if ( 0 == $user_id ) {
+			if ( 0 === $user_id ) {
 				return;
 			}
 
@@ -488,7 +488,7 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 		 *
 		 * @return bool
 		 */
-		public function is_owner( $user ) {
+		public function is_owner( $user ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 			// todo perform a real check for gift card ownership.
 			return true;
 		}
@@ -680,7 +680,7 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 		 * Set the gift card as sent
 		 */
 		public function set_as_sent() {
-			$this->delivery_send_date = current_time( 'timestamp' ); //phpcs:ignore --timestamp is discouraged
+			$this->delivery_send_date = current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 			update_post_meta( $this->ID, self::META_SEND_DATE, $this->delivery_send_date );
 		}
 
@@ -773,7 +773,7 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 				'post_parent' => $this->product_id,
 			);
 
-			if ( 0 == $this->ID ) {
+			if ( 0 === $this->ID ) {
 				// Insert the post into the database.
 				$this->ID = wp_insert_post( $args );
 			} else {
