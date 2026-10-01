@@ -245,14 +245,14 @@ if ( ! class_exists( 'YITH_YWGC_Emails' ) ) {
 			if ( is_rtl() ) {
 				wc_get_template(
 					'emails/style-rtl.css',
-					'',
+					array(),
 					'',
 					YITH_YWGC_TEMPLATES_DIR
 				);
 			} else {
 				wc_get_template(
 					'emails/style.css',
-					'',
+					array(),
 					'',
 					YITH_YWGC_TEMPLATES_DIR
 				);
@@ -323,8 +323,8 @@ if ( ! class_exists( 'YITH_YWGC_Emails' ) ) {
 			wc_get_template(
 				'emails/gift-card-footer.php',
 				array(
-					'email'      => $email,
-					'shop_name'  => $shop_name,
+					'email'     => $email,
+					'shop_name' => $shop_name,
 					'shop_link' => $shop_link,
 				),
 				'',

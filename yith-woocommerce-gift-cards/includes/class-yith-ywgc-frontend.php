@@ -413,7 +413,7 @@ if ( ! class_exists( 'YITH_YWGC_Frontend' ) ) {
 
 				wc_get_template(
 					'single-product/add-to-cart/gift-card.php',
-					'',
+					array(),
 					'',
 					trailingslashit( YITH_YWGC_TEMPLATES_DIR )
 				);
