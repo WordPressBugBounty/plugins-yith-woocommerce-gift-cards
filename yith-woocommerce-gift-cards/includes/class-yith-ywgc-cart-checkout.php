@@ -245,7 +245,10 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 			$total_discount_amount = $discount_amount + $discount_amount_tax;
 
 			if ( $gift instanceof YITH_YWGC_Gift_Card ) {
-				$gift->update_balance( $gift->get_balance() - $total_discount_amount );
+				if ( ! $gift->deduct_balance_atomic( $total_discount_amount ) ) {
+					throw new Exception( esc_html__( 'The gift card does not have sufficient balance.', 'yith-woocommerce-gift-cards' ) );
+				}
+
 				$gift->register_order( $order_id );
 			}
 		}
@@ -1000,7 +1003,10 @@ if ( ! class_exists( 'YITH_YWGC_Cart_Checkout' ) ) {
 							 */
 							$new_balance = apply_filters( 'yith_ywgc_new_balance_before_update_balance', max( 0.00, $gift->get_balance() - $amount ), $gift, $amount );
 
-							$gift->update_balance( $new_balance );
+							if ( ! $gift->deduct_balance_atomic( $amount ) ) {
+								throw new Exception( esc_html__( 'The gift card does not have sufficient balance.', 'yith-woocommerce-gift-cards' ) );
+							}
+
 							$gift->register_order( $order_id );
 						}
 					}

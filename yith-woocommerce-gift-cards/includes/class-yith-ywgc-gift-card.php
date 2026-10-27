@@ -908,5 +908,54 @@ if ( ! class_exists( 'YITH_YWGC_Gift_Card' ) ) {
 
 			return $formatted_date;
 		}
+
+		/**
+		 * Atomically deduct an amount from the gift card balance.
+		 *
+		 * @param float $amount Amount to deduct.
+		 * @return bool True on success, false otherwise.
+		 */
+		public function deduct_balance_atomic( $amount ) {
+			global $wpdb;
+
+			$amount = wc_format_decimal( $amount );
+
+			if ( ! $this->ID || ! is_numeric( $amount ) || (float) $amount <= 0 ) {
+				return false;
+			}
+
+			$updated = $wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$wpdb->postmeta}
+					SET meta_value = CAST(meta_value AS DECIMAL(20, 6)) - %s
+					WHERE post_id = %d
+					AND meta_key = %s
+					AND CAST(meta_value AS DECIMAL(20, 6)) >= %s",
+					$amount,
+					$this->ID,
+					self::META_BALANCE_TOTAL,
+					$amount
+				)
+			);
+
+			if ( 1 !== $updated ) {
+				return false;
+			}
+
+			wp_cache_delete( $this->ID, 'post_meta' );
+
+			$this->total_balance = (float) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value
+					FROM {$wpdb->postmeta}
+					WHERE post_id = %d
+					AND meta_key = %s",
+					$this->ID,
+					self::META_BALANCE_TOTAL
+				)
+			);
+
+			return true;
+		}
 	}
 }

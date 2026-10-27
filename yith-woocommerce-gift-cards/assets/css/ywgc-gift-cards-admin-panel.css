@@ -254,6 +254,10 @@ p.ywgc-category-image-description.description{
     font-weight: 600;
 }
 
+.edit-php.post-type-gift_card .yith-plugin-ui--classic-wp-list-style .wrap:has(.wp-list-table tr.no-items) .tablenav .actions {
+    display: none;
+}
+
 .ywgc_usage_expiration_months_span{
     position: absolute;
     margin-top: -37px;
